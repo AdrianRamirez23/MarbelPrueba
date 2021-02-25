@@ -167,7 +167,6 @@
     <Content Include="Views\SolicitudClientes\Index.cshtml" />
     <Content Include="Views\SolicitudClientes\Create.cshtml" />
     <Content Include="Views\SolicitudClientes\Edit.cshtml" />
-    <Content Include="Views\SolicitudClientes\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

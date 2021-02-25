@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 
@@ -162,76 +163,34 @@ namespace MVC.Web.Marbel.Controllers
                 throw (ex);
             }
         }
-        public ActionResult Delete( string idCliente)
+        public ActionResult Delete(int idsol, string idCliente)
         {
             try
-            {
-                string Metodo = "ListaServiciosXClientes?idCliente=" + idCliente;
-                var json = new WebClient().DownloadString(url + Metodo);
-                var m = JsonConvert.DeserializeObject<ClienteSolicitud>(json);
-
-                ClienteSolicitud Sol = new ClienteSolicitud();
-                Sol.idCliente = m.idCliente;
-                Sol.PrimerNombre = m.PrimerNombre;
-                Sol.SegundoNombre = m.SegundoNombre;
-                Sol.PrimerApellido = m.PrimerApellido;
-                Sol.SegundoApellido = m.SegundoApellido;
-                Sol.TipoDocumento = m.TipoDocumento;
-                Sol.Direccion = m.Direccion;
-                Sol.Celular = m.Celular;
-                Sol.Email = m.Email;
-                Sol.TipoVehiculo = m.TipoVehiculo;
-                Sol.PlacaVehiculo = m.PlacaVehiculo;
-                Sol.DescripcionSolicitud = m.DescripcionSolicitud;
-                Sol.Presupuesto = m.Presupuesto;
-                Sol.idSolicitud = m.idSolicitud;
-                Sol.EstadoSolicitud = m.EstadoSolicitud;
-
-                return View(Sol);
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-        }
-        [HttpDelete]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(ClienteSolicitud Sol)
-        {
-            if (!ModelState.IsValid)
-                return View();
-            try
-            {
-                string metodo = "EliminarServiciosXClientes?idsol="+Sol.idSolicitud+"&idCliente="+Sol.idCliente;
-                string Result = null;
-                var objson = JsonConvert.SerializeObject(Sol);
-
-                WebRequest request = WebRequest.Create(url + metodo);
-                request.Method = "put";
-                request.ContentType = "application/json;charset=UTF-8";
-
-                using (var oSW = new StreamWriter(request.GetRequestStream()))
+            {         
+                using (var client = new HttpClient())
                 {
-                    oSW.Write(objson);
-                    oSW.Flush();
-                    oSW.Close();
-                }
-                WebResponse respon = request.GetResponse();
+                    client.BaseAddress = new Uri(url);
 
-                using (var oSR = new StreamReader(respon.GetResponseStream()))
-                {
-                    Result = oSR.ReadToEnd();
+                    var deletetask = client.DeleteAsync($"EliminarServiciosXClientes?idsol=" + idsol.ToString() + "&idCliente=" + idCliente);
+                    deletetask.Wait();
+                    var result = deletetask.Result;
+                    if (result.IsSuccessStatusCode)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                  
                 }
-
-                return RedirectToAction("Index");
+                return View("Index");
+                    
             }
             catch (Exception ex)
             {
-                throw (ex);
+
+                throw(ex);
             }
         }
-
+      
+      
 
     }
 }
